@@ -10,7 +10,7 @@ step 1 download repository
 
 step 2 Install related libraries
 
-    pip install -r requirements
+    pip install -r requirements.txt
 
 ##  Demo
 
