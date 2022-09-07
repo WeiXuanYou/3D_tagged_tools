@@ -20,6 +20,6 @@ Run
 
 Example
 
-    python main.py .\3d_obj\LibertyStatue\LibertStatue.obj
+    python main.py .\3D_OBJ\LibertyStatue\LibertStatue.obj
     
 ![](https://i.imgur.com/kswMlbi.png)
