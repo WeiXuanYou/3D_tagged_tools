@@ -6,7 +6,7 @@ This tool mainly augments the 3D object detection dataset by loading 3D objects 
 ## Get Started 
 step 1 download repository
 
-    git clone https://github.com/WeiXuanYou/3D_tagged_tools.git
+    git clone https://github.com/WeiXuanYou/Augmented-3D-BBOX-data-through-virtual-3D-object.git
 
 step 2 Install related libraries
 
