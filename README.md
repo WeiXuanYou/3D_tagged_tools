@@ -23,3 +23,6 @@ Example
     python main.py .\3D_OBJ\LibertyStatue\LibertStatue.obj
     
 ![](https://i.imgur.com/kswMlbi.png)
+
+## Reference
+[1] https://www.pygame.org/wiki/OBJFileLoader
