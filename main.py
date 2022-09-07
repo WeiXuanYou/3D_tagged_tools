@@ -10,7 +10,6 @@ import copy
 from PIL import Image
 import cv2
 import numpy as np
-import threading
 
 # IMPORT OBJECT LOADER
 from objloader import *
@@ -59,6 +58,13 @@ class GameWindow:
 
         self.bg_img = cv2.imread(r"bg_1.jpg")
         self.bg_img = cv2.resize(self.bg_img,self.viewport)
+
+        self.img = np.zeros((self.viewport[1],self.viewport[0],3),dtype=np.uint8)
+
+        self.img_bbox_coordinates = [(0, 0),(0, 0),
+                                     (0, 0),(0, 0),
+                                     (0, 0),(0, 0),
+                                     (0, 0),(0, 0)]
        
 
     def save_screenshot(self,filename = r'test.png'):
@@ -75,57 +81,76 @@ class GameWindow:
         pixels = glReadPixels(0,0,*self.viewport,GL_RGB,GL_UNSIGNED_BYTE)
 
         img = Image.frombytes("RGB",self.viewport,pixels)
+        
         return np.array(img)[:,:,::-1].astype(np.uint8)
 
+
+    def get_BBOX(self):
+        x_min,y_min,z_min,x_max,y_max,z_max = self.obj.get_min_max()
+
+        verticies = ((x_max, y_min, z_min),(x_max, y_max, z_min),
+                     (x_min, y_max, z_min),(x_min, y_min, z_min),
+                     (x_max, y_min, z_max),(x_max, y_max, z_max),
+                     (x_min, y_min, z_max),(x_min, y_max, z_max))
+
+        img_bbox_coordinates = []
+
+        #Convert 3D to 2D coordinates
+        for i in verticies:
+            img_bbox_coordinates.append(tuple(map(int,gluProject(*i)))[:2])
+            #print(f"{tuple(map(int,gluProject(*i)))[:2]}",end ='')
+        #print()
+
+        return img_bbox_coordinates
+
     def display_BBOX(self):
-        while(True):
-            try:
-                img = self.get_screenshot()
-                bg_img = copy.deepcopy(self.bg_img)
+        bg_img = copy.deepcopy(self.bg_img)
+        
+        edges = ((0,1),(0,3),(0,4),(2,1),
+                    (2,3),(2,7),(6,3),(6,4),
+                    (6,7),(5,1),(5,4),(5,7))
 
-                x_min,y_min,z_min,x_max,y_max,z_max = self.obj.get_min_max()
+        #Draw bbox
+        for edge in edges:
+            #print(self.img_bbox_coordinates[edge[0]])
+            #print(self.img_bbox_coordinates[edge[1]])
+        #    point1 = tuple(map(int,gluProject(*verticies[edge[0]])[:2]))
+        #    point2 = tuple(map(int,gluProject(*verticies[edge[1]])[:2]))
+            self.img = cv2.line(self.img,
+                            self.img_bbox_coordinates[edge[0]],
+                            self.img_bbox_coordinates[edge[1]],
+                            (255,0,0),3)
 
-                verticies = ((x_max, y_min, z_min),(x_max, y_max, z_min),
-                            (x_min, y_max, z_min),(x_min, y_min, z_min),
-                            (x_max, y_min, z_max),(x_max, y_max, z_max),
-                            (x_min, y_min, z_max),(x_min, y_max, z_max))
+        self.img = cv2.flip(self.img,0)
+        
+        #Add a background to an image
+        for i in range(self.img.shape[0]):
+            for j in range(self.img.shape[1]):
+                if(sum(self.img[i,j,:])//3 > 0):
+                    bg_img[i,j,:] = self.img[i,j,:]
+        cv2.imshow("BBOX",bg_img)
+        cv2.waitKey(2)
 
-                edges = ((0,1),(0,3),(0,4),(2,1),
-                        (2,3),(2,7),(6,3),(6,4),
-                        (6,7),(5,1),(5,4),(5,7))
+    def update_screen(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-                #Draw bbox
-                for edge in edges:
-                    point1 = tuple(map(int,gluProject(*verticies[edge[0]])[:2]))
-                    point2 = tuple(map(int,gluProject(*verticies[edge[1]])[:2]))
-                    img = cv2.line(img,point1,point2,(255,0,0),3)
+        glLoadIdentity()
 
-                img = cv2.flip(img,0)
+            # RENDER OBJECT
+        glTranslate(self.tx/20., self.ty/20., - self.zpos)
+        glRotate(self.ry, 1, 0, 0)
+        glRotate(self.rx, 0, 1, 0)
+        self.obj.render()
 
-                #Display BBOX 2D coordinates
-                for i in verticies:
-                    print(f"{tuple(map(int,gluProject(*i)))[:2]}",end ='')
-                print()
-
-                #Add a background to an image
-                for i in range(img.shape[0]):
-                    for j in range(img.shape[1]):
-                        if(sum(img[i,j,:])//3 > 0):
-                            bg_img[i,j,:] = img[i,j,:]
-
-                cv2.imshow("BBOX",bg_img)
-                cv2.waitKey(2)
-
-            except Exception as e:
-                print(f"{e}")
-                continue
-                
+        pygame.display.flip()
+        self.img_bbox_coordinates = self.get_BBOX()
+        self.img = self.get_screenshot() 
+        self.display_BBOX()
+        
 
     def main_loop(self):
         clock = pygame.time.Clock()
-        
-        threading.Thread(target=self.display_BBOX,daemon=True).start()
-        
+   
         while(True):
             clock.tick(30)
             for e in pygame.event.get():
@@ -160,18 +185,9 @@ class GameWindow:
                         self.tx += i
                         self.ty -= j
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-            glLoadIdentity()
-
-            # RENDER OBJECT
-            glTranslate(self.tx/20., self.ty/20., - self.zpos)
-            glRotate(self.ry, 1, 0, 0)
-            glRotate(self.rx, 0, 1, 0)
-            self.obj.render()
-
-            pygame.display.flip()
-
+            self.update_screen()
+            
+            #self.display_BBOX()
 
 if __name__ == '__main__':
     window = GameWindow()
