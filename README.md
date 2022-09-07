@@ -1,6 +1,6 @@
 
 # Augmented 3D BBOX data through virtual 3D object
-This tool mainly augments the 3D object detection dataset by loading 3D objects (eg .obj, .fbx) and projecting them into 3D space using pygame and openGL, and manipulating and replacing different objects and scenes by rotating or translating .
+This tool mainly augments the 3D object detection dataset by loading 3D objects (eg .obj, .fbx) and projecting them into 3D space using pygame and openGL, and manipulating and replacing different objects and scenes by rotating or translating.
 
 
 ## Get Started 
