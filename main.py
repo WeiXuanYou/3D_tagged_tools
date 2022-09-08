@@ -103,8 +103,19 @@ class GameWindow:
 
         return img_bbox_coordinates
 
-    def display_BBOX(self):
+    #@staticmethod
+    def paste_to_background(self):
+
         bg_img = copy.deepcopy(self.bg_img)
+        gray = cv2.cvtColor(self.img,cv2.COLOR_BGR2GRAY)
+        mask = cv2.threshold(gray,10,255,cv2.THRESH_BINARY)[1]
+        bg_img = cv2.bitwise_or(self.img,bg_img,mask=~mask)
+        bg_img = cv2.bitwise_or(self.img,bg_img)
+        return bg_img
+#
+ 
+    def display_BBOX(self):
+       
         
         edges = ((0,1),(0,3),(0,4),(2,1),
                     (2,3),(2,7),(6,3),(6,4),
@@ -124,10 +135,7 @@ class GameWindow:
         self.img = cv2.flip(self.img,0)
         
         #Add a background to an image
-        for i in range(self.img.shape[0]):
-            for j in range(self.img.shape[1]):
-                if(sum(self.img[i,j,:])//3 > 0):
-                    bg_img[i,j,:] = self.img[i,j,:]
+        bg_img = self.paste_to_background()
         cv2.imshow("BBOX",bg_img)
         cv2.waitKey(2)
 
