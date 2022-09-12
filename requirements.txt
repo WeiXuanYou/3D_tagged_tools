@@ -1,4 +1,5 @@
 opencv-python
+PyOpenGL-accelerate
 numpy
 Pillow
 pygame
