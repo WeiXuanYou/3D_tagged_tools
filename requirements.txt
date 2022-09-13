@@ -1,6 +1,6 @@
-opencv-python
-PyOpenGL-accelerate
-numpy
-Pillow
-pygame
-pyopengl
+opencv-python==4.6.0
+PyOpenGL-accelerate==3.1.6
+numpy==1.23.1
+Pillow==9.2.0
+pygame==2.1.2
+pyopengl==3.1.6
