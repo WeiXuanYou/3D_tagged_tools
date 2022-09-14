@@ -14,10 +14,6 @@ step 2 Install related libraries
 
 ##  Demo
 
-Run
-    
-    python main.py your_object_file
-
 Example
 
     python main.py --show_3d_bbox
