@@ -69,7 +69,7 @@ class GameWindow:
 
     def save_screenshot(self,filename = r'test.png'):
         
-        glReadBuffer(GL_FRONT)
+        #glReadBuffer(GL_FRONT)
         pixels = glReadPixels(0,0,*self.viewport,GL_RGB,GL_UNSIGNED_BYTE)
         
         image = Image.frombytes("RGB", self.viewport, pixels)
