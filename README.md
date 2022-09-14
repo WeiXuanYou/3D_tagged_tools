@@ -20,7 +20,7 @@ Run
 
 Example
 
-    python main.py .\3D_OBJ\LibertStatue.obj
+    python main.py --show_3d_bbox
     
 ![](https://i.imgur.com/kswMlbi.png)
 
