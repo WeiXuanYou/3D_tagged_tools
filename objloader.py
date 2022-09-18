@@ -133,7 +133,7 @@ class OBJ:
         glDeleteLists([self.gl_list])
 
 
-    def get_min_max(self) -> tuple:
+    def get_min_max_pos(self) -> tuple:
         
         x_max = max([vertice[0] for vertice in self.vertices])
         y_max = max([vertice[1] for vertice in self.vertices])
